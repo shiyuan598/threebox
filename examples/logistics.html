@@ -5,7 +5,7 @@
 	<script src="config.js"></script>
 	<script src='https://api.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js'></script>
 	<link href='https://api.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css' rel='stylesheet' />
-	<script src="https://d3js.org/d3.v5.min.js"></script>
+	<!-- <script src="https://d3js.org/d3.v5.min.js"></script> -->
 	<style>
 		body, html { 
 			width: 100%;
@@ -70,11 +70,10 @@
 					}
 
 					tb.loadObj(options, function(model) {
-
+            console.info(model)
 						truck = model.setCoords(origin);
 						tb.add(truck);                        
-					})
-
+          })
 				},
 				
 				render: function(gl, matrix){
@@ -94,6 +93,7 @@
 
 			var url = "https://api.mapbox.com/directions/v5/mapbox/driving/"+[origin, destination].join(';')+"?geometries=geojson&access_token=" + config.accessToken
 
+      console.info(url)
 
 			fetchFunction(url, function(data){
 

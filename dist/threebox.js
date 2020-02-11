@@ -17,182 +17,210 @@ var Object3D = require("./objects/Object3D.js");
 var line = require("./objects/line.js");
 var tube = require("./objects/tube.js");
 
-function Threebox(map, glContext, options){
+function Threebox (map, glContext, options) {
 
-    this.init(map, glContext, options);
+  this.init(map, glContext, options);
 
 };
 
 Threebox.prototype = {
 
-    repaint: function(){
-        this.map.repaint = true;
-    },
+  repaint: function () {
+    this.map.repaint = true;
+  },
 
-    init: function (map, glContext, options){
+  init: function (map, glContext, options) {
 
-        this.map = map;
+    this.map = map;
 
-        // Set up a THREE.js scene
-        this.renderer = new THREE.WebGLRenderer( { 
-            alpha: true, 
-            antialias: true,
-            canvas: map.getCanvas(),
-            context: glContext
-        } );
+    // Set up a THREE.js scene
+    this.renderer = new THREE.WebGLRenderer({
+      alpha: true,
+      antialias: true,
+      canvas: map.getCanvas(),
+      context: glContext
+    });
 
-        this.renderer.shadowMap.enabled = true;
-        this.renderer.autoClear = false;
+    this.renderer.shadowMap.enabled = true;
+    this.renderer.autoClear = false;
 
-        this.scene = new THREE.Scene();
-        this.camera = new THREE.PerspectiveCamera( 28, window.innerWidth / window.innerHeight, 0.000000000001, Infinity);
+    this.scene = new THREE.Scene();
+    this.camera = new THREE.PerspectiveCamera(28, window.innerWidth / window.innerHeight, 0.000000000001, Infinity);
 
-        // The CameraSync object will keep the Mapbox and THREE.js camera movements in sync.
-        // It requires a world group to scale as we zoom in. Rotation is handled in the camera's
-        // projection matrix itself (as is field of view and near/far clipping)
-        // It automatically registers to listen for move events on the map so we don't need to do that here
-        this.world = new THREE.Group();
-        this.scene.add(this.world);
+    // The CameraSync object will keep the Mapbox and THREE.js camera movements in sync.
+    // It requires a world group to scale as we zoom in. Rotation is handled in the camera's
+    // projection matrix itself (as is field of view and near/far clipping)
+    // It automatically registers to listen for move events on the map so we don't need to do that here
+    this.world = new THREE.Group();
+    this.scene.add(this.world);
 
-        this.cameraSync = new CameraSync(this.map, this.camera, this.world);
+    this.cameraSync = new CameraSync(this.map, this.camera, this.world);
 
-        //raycaster for mouse events
-        this.raycaster = new THREE.Raycaster();
+    //raycaster for mouse events
+    this.raycaster = new THREE.Raycaster();
 
-        // apply starter options
-        
-        this.options = utils._validate(options || {}, defaultOptions);
-        if (this.options.defaultLights) this.defaultLights();
-        
-    },
+    // apply starter options
 
-    // Objects
+    this.options = utils._validate(options || {}, defaultOptions);
+    if (this.options.defaultLights) this.defaultLights();
 
-    objects: new Objects(AnimationManager),
+  },
 
-    sphere: sphere,
+  // Objects
 
-    line: line,
+  objects: new Objects(AnimationManager),
 
-    tube: function(obj){
-        return tube(obj, this.world)
-    },
+  sphere: sphere,
 
-    Object3D: function(obj, o) {
-        return Object3D(obj, o)
-    },
+  line: line,
 
-    loadObj: loadObj,
+  tube: function (obj) {
+    return tube(obj, this.world)
+  },
 
+  Object3D: function (obj, o) {
+    return Object3D(obj, o)
+  },
 
-    // Material
-
-    material: function(o){
-        return material(o)
-    },
-
-    utils: utils,
-
-    projectToWorld: function(coords) {
-        return this.utils.projectToWorld(coords)
-    },
-
-    unprojectFromWorld: function(v3) {
-        return this.utils.unprojectFromWorld(v3)
-    },
-
-    projectedUnitsPerMeter: function(lat) {
-        return this.utils.projectedUnitsPerMeter(lat)
-    },
-
-    queryRenderedFeatures: function(point){
-
-        var mouse = new THREE.Vector2();
-        
-        // // scale mouse pixel position to a percentage of the screen's width and height
-        mouse.x = ( point.x / this.map.transform.width ) * 2 - 1;
-        mouse.y = 1 - ( point.y / this.map.transform.height ) * 2;
-
-        this.raycaster.setFromCamera(mouse, this.camera);
-
-        // calculate objects intersecting the picking ray
-        var intersects = this.raycaster.intersectObjects(this.world.children, true);
-
-        return intersects
-    },
-
-    update: function() {
-        
-        if (this.map.repaint) this.map.repaint = false
-
-        var timestamp = Date.now();
-
-        // Update any animations
-        this.objects.animationManager.update(timestamp);
-        
-        this.renderer.state.reset();
-
-        // Render the scene and repaint the map
-        this.renderer.render( this.scene, this.camera );
-
-        if (this.options.passiveRendering === false) this.map.triggerRepaint();
-    },
-
-    add: function(obj) {
-        this.world.add(obj);
-    },
-
-    remove: function(obj) {
-        this.world.remove(obj);
-    },
+  loadObj: loadObj,
 
 
-    defaultLights: function(){
+  // Material
 
-        this.scene.add( new THREE.AmbientLight( 0xffffff ) );
-        var sunlight = new THREE.DirectionalLight(0xffffff, 0.25);
-        sunlight.position.set(0,80000000,100000000);
-        sunlight.matrixWorldNeedsUpdate = true;
-        this.world.add(sunlight);
+  material: function (o) {
+    return material(o)
+  },
 
-    },
+  utils: utils,
 
-    memory: function (){ return this.renderer.info.memory},
+  projectToWorld: function (coords) {
+    return this.utils.projectToWorld(coords)
+  },
 
-    version: '0.3.0',
+  unprojectFromWorld: function (v3) {
+    return this.utils.unprojectFromWorld(v3)
+  },
 
-    // DEPRECATED METHODS
+  projectedUnitsPerMeter: function (lat) {
+    return this.utils.projectedUnitsPerMeter(lat)
+  },
 
-    setupDefaultLights: function() {
-        console.warn('.setupDefaultLights() has been moved to a "defaultLights" option inside Threebox()')
-        this.defaultLights();
-    },
+  queryRenderedFeatures: function (point) {
 
-    addAtCoordinate: function(obj, lnglat, options) {
-        
-        console.warn('addAtCoordinate() has been deprecated. Check out the and threebox.add() Object.setCoords() methods instead.')
-        
-        obj = this.Object3D({obj:obj});
+    var mouse = new THREE.Vector2();
 
-        obj.setCoords(lnglat)
-        this.add(obj);
+    // // scale mouse pixel position to a percentage of the screen's width and height
+    mouse.x = (point.x / this.map.transform.width) * 2 - 1;
+    mouse.y = 1 - (point.y / this.map.transform.height) * 2;
 
-        return obj;
-    },
+    this.raycaster.setFromCamera(mouse, this.camera);
 
-    moveToCoordinate: function(obj, lnglat, options) {
-        console.warn('addAtCoordinate() has been deprecated. Check out the Object.setCoords() and threebox.add() methods instead.')
+    // calculate objects intersecting the picking ray
+    var intersects = this.raycaster.intersectObjects(this.world.children, true);
 
-        if (!obj.setCoords) obj = this.Object3D(obj);
-        obj.setCoords(lnglat, options);
+    return intersects
+  },
 
-        return obj;
+  update: function () {
+
+    if (this.map.repaint) this.map.repaint = false
+
+    var timestamp = Date.now();
+
+    // Update any animations
+    this.objects.animationManager.update(timestamp);
+
+    this.renderer.state.reset();
+
+    // Render the scene and repaint the map
+    this.renderer.render(this.scene, this.camera);
+
+    if (this.options.passiveRendering === false) this.map.triggerRepaint();
+  },
+
+  add: function (obj) {
+    this.world.add(obj);
+  },
+
+  // add by wsy
+  clone: function (obj) {
+    let clone = obj.clone()
+    return this.Object3D({
+      obj: clone
+    })
+  },
+
+  remove: function (obj) {
+    this.world.remove(obj);
+    let enroll = this.objects.animationManager.enrolledObjects
+    for (let i in enroll) {
+      if (enroll[i] === obj) {
+        enroll.splice(i, 1)
+      }
     }
+    if (obj.material && obj.material.map) {
+      obj.material.map.dispose()
+    }
+    if (obj.geometry) {
+      obj.geometry.dispose()
+    }
+    if (obj.metrial) {
+      obj.metrial.dispose()
+    }
+    obj.indices = []
+    obj.vertices = []
+    obj.uvs = []
+    obj = null
+  },
+
+
+  defaultLights: function () {
+
+    this.scene.add(new THREE.AmbientLight(0xffffff));
+    var sunlight = new THREE.DirectionalLight(0xffffff, 0.25);
+    sunlight.position.set(0, 80000000, 100000000);
+    sunlight.matrixWorldNeedsUpdate = true;
+    this.world.add(sunlight);
+
+  },
+
+  memory: function () { return this.renderer.info.memory },
+
+  version: '0.3.0',
+
+  // DEPRECATED METHODS
+
+  setupDefaultLights: function () {
+    console.warn('.setupDefaultLights() has been moved to a "defaultLights" option inside Threebox()')
+    this.defaultLights();
+  },
+
+  addAtCoordinate: function (obj, lnglat, options) {
+
+    console.warn('addAtCoordinate() has been deprecated. Check out the and threebox.add() Object.setCoords() methods instead.')
+
+    obj = this.Object3D({ obj: obj });
+
+    obj.setCoords(lnglat)
+    this.add(obj);
+
+    return obj;
+  },
+
+  moveToCoordinate: function (obj, lnglat, options) {
+    console.warn('addAtCoordinate() has been deprecated. Check out the Object.setCoords() and threebox.add() methods instead.')
+
+    // add by wsy - modify: this.Object3D(obj) — this.Object3D({ obj: obj })
+    if (!obj.setCoords) obj = this.Object3D({ obj: obj });
+    obj.setCoords(lnglat, options);
+
+    return obj;
+  }
 }
 
 var defaultOptions = {
-    defaultLights: false,
-    passiveRendering: true
+  defaultLights: false,
+  passiveRendering: true
 }
 module.exports = exports = Threebox;
 
@@ -722,7 +750,11 @@ AnimationManager.prototype = {
             
             if (q) this.quaternion.setFromAxisAngle(q[0], q[1]);
             
-            if (w) this.position.copy(w);
+            if (w) {
+              this.position.copy(w);
+              // add by wsy
+              this.coords = utils.unprojectFromWorld(w).slice(0, -1)
+            }
 
             map.repaint = true
         }
@@ -3371,11 +3403,11 @@ Objects.prototype = {
 
 	},
 
-	_addMethods: function(obj, static){
+	_addMethods: function(obj, _static){ // modified by wsy - change 'static' -> '_static'
 
 		var root = this;
 
-		if (static) {
+		if (_static) {
 
 		}
 
@@ -3423,7 +3455,7 @@ Objects.prototype = {
 
 		obj.add = function(){
 	        root.world.add(obj);
-	        if (!static) obj.set({position:obj.coordinates});
+	        if (!_static) obj.set({position:obj.coordinates});
 	        return obj;
 		}
 

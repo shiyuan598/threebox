@@ -138,7 +138,11 @@ AnimationManager.prototype = {
             
             if (q) this.quaternion.setFromAxisAngle(q[0], q[1]);
             
-            if (w) this.position.copy(w);
+            if (w) {
+              this.position.copy(w);
+              // add by wsy
+              this.coords = utils.unprojectFromWorld(w).slice(0, -1)
+            }
 
             map.repaint = true
         }
