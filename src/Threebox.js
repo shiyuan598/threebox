@@ -8,6 +8,7 @@ var Objects = require("./objects/objects.js");
 var material = require("./utils/material.js");
 var sphere = require("./objects/sphere.js");
 var loadObj = require("./objects/loadObj.js");
+var loadGLTF = require("./objects/loadGLTF.js");
 var Object3D = require("./objects/Object3D.js");
 var line = require("./objects/line.js");
 var tube = require("./objects/tube.js");
@@ -19,7 +20,6 @@ function Threebox (map, glContext, options) {
 };
 
 Threebox.prototype = {
-
   repaint: function () {
     this.map.repaint = true;
   },
@@ -78,7 +78,8 @@ Threebox.prototype = {
   },
 
   loadObj: loadObj,
-
+  // add by wsy
+  loadGLTF: loadGLTF, // 导入gltf
 
   // Material
 
@@ -136,6 +137,9 @@ Threebox.prototype = {
   add: function (obj) {
     this.world.add(obj);
   },
+
+  // add by wsy
+  // 注册普通模型为threebox模型
 
   // add by wsy
   clone: function (obj) {
