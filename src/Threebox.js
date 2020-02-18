@@ -140,6 +140,11 @@ Threebox.prototype = {
 
   // add by wsy
   // 注册普通模型为threebox模型
+  toThreeboxModel: function (obj) {
+    return this.Object3D({
+      obj: obj
+    })
+  },
 
   // add by wsy
   clone: function (obj) {
