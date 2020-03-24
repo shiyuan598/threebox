@@ -66,7 +66,10 @@ Objects.prototype = {
 				if (obj.userData.units === 'meters'){
 					var s = utils.projectedUnitsPerMeter(lnglat[1]);
 					obj.scale.set(s,s,s);
-				}
+        }
+        
+        // add by wsy
+        obj.coords = lnglat;
 
 				obj.coordinates = lnglat;
 	        	obj.set({position:lnglat})
