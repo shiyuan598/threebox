@@ -25,7 +25,7 @@ function Threebox (map, glContext, options) {
 };
 
 Threebox.prototype = {
-  
+
   repaint: function () {
     this.map.repaint = true;
   },
