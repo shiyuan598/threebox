@@ -6040,6 +6040,8 @@ MTLLoader.MaterialCreator.prototype = {
 
 };
 
+THREE.MTLLoader = MTLLoader;
+
 module.exports = exports = MTLLoader;
 },{"../../three.js":18}],14:[function(require,module,exports){
 /**
@@ -6787,6 +6789,8 @@ OBJLoader.prototype = {
     }
 
 };
+
+THREE.OBJLoader = OBJLoader;
 
 module.exports = exports = OBJLoader;
 },{"../../three.js":18}],15:[function(require,module,exports){

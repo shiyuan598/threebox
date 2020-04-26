@@ -540,4 +540,6 @@ MTLLoader.MaterialCreator.prototype = {
 
 };
 
+THREE.MTLLoader = MTLLoader;
+
 module.exports = exports = MTLLoader;

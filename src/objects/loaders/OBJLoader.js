@@ -744,4 +744,6 @@ OBJLoader.prototype = {
 
 };
 
+THREE.OBJLoader = OBJLoader;
+
 module.exports = exports = OBJLoader;
