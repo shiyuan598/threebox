@@ -20,8 +20,6 @@ function Threebox (map, glContext, options) {
 };
 
 Threebox.prototype = {
-  // add by wsy
-  THREE: THREE,
   
   repaint: function () {
     this.map.repaint = true;
