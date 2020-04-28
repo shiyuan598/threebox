@@ -119,6 +119,9 @@ Threebox.prototype = {
   },
 
   update: function () {
+    if(typeof this.map === 'undefined'){
+      return;
+    }
 
     if (this.map.repaint) this.map.repaint = false
 

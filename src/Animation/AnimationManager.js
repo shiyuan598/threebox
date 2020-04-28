@@ -92,6 +92,9 @@ AnimationManager.prototype = {
         }
 
         obj.followPath = function (options, cb){
+            if (!map) {
+              return;
+            }
 
             var entry = {
                 type: 'followPath', 
@@ -113,6 +116,9 @@ AnimationManager.prototype = {
             this.animationQueue
                 .push(entry);
 
+            if(typeof map === 'undefined'){
+              return;
+            }
             map.repaint = true;
             
             return this;
@@ -143,12 +149,18 @@ AnimationManager.prototype = {
               // add by wsy
               this.coords = utils.unprojectFromWorld(w).slice(0, -1)
             }
+            if(typeof map === 'undefined'){
+              return;
+            }
 
             map.repaint = true
         }
     },
 
     update: function(now) {
+      if(typeof map === 'undefined'){
+        return;
+      }
 
         if (this.previousFrameTime === undefined) this.previousFrameTime = now;
 
